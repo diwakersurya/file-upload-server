@@ -13,17 +13,18 @@ app.use(function (req, res, next) {
 });
 app.post('/upload', function (req, res) {
     console.log(">>>>>>>", req.files);
-    if (Object.keys(req.files).length == 0) {
-        return res.status(400).send('No files were uploaded.');
-    }
-    // Use the mv() method to place the file somewhere on your server
-    req.files.data.mv(`${publicDir}/${req.files.data.name}`, function (err) {
-        if (err) {
-            console.error(err)
-            return res.status(500).send(err);
-        }
-        res.json({ success: true });
-    });
+    res.json ({success:true});
+    // if (Object.keys(req.files).length == 0) {
+    //     return res.status(400).send('No files were uploaded.');
+    // }
+    // // Use the mv() method to place the file somewhere on your server
+    // req.files.data.mv(`${publicDir}/${req.files.data.name}`, function (err) {
+    //     if (err) {
+    //         console.error(err)
+    //         return res.status(500).send(err);
+    //     }
+    //     res.json({ success: true });
+    // });
 });
 const port = 5000
 app.listen(port, () => console.log(`file server listening on port ${port}!`))
