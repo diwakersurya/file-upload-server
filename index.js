@@ -25,8 +25,5 @@ app.post('/upload', function (req, res) {
         res.json({ success: true });
     });
 });
-app.get('/', function (req, res) {
-     res.sendfile(__dirname + '/index.html');
-});
 const port = 5000
 app.listen(port, () => console.log(`file server listening on port ${port}!`))
