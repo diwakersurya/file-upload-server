@@ -12,7 +12,6 @@ app.use(function (req, res, next) {
     next();
 });
 app.post('/upload', function (req, res) {
-    console.log(">>>>>>>", req.files);
     res.json ({success:true});
     // if (Object.keys(req.files).length == 0) {
     //     return res.status(400).send('No files were uploaded.');
