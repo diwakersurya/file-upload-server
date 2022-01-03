@@ -1,60 +1,157 @@
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-        <title>upload file</title>
-    </head>
-    <body>
-        <input id="fileupload" name="data" type="file" />
-        <input type="submit" value="upload" id="upload" />
-    </body>
-    <script>
-        const url = '/upload';
-        document
-            .querySelector('#upload')
-            .addEventListener('click', function(e) {
-                e.preventDefault();
-                var fileInput = document.getElementById('fileupload');
-                var file = fileInput.files[0];
-                var formData = new FormData();
-                formData.append('file', file);
-                var xhr = new XMLHttpRequest();
-                xhr.addEventListener(
-                    'progress',
-                    function(e) {
-                        var done = e.position || e.loaded,
-                            total = e.totalSize || e.total;
-                        console.log(
-                            'xhr progress: ' +
-                                Math.floor((done / total) * 1000) / 10 +
-                                '%'
-                        );
-                    },
-                    false
-                );
-                if (xhr.upload) {
-                    xhr.upload.onprogress = function(e) {
-                        var done = e.position || e.loaded,
-                            total = e.totalSize || e.total;
-                        console.log(
-                            'xhr.upload progress: ' +
-                                done +
-                                ' / ' +
-                                total +
-                                ' = ' +
-                                Math.floor((done / total) * 1000) / 10 +
-                                '%'
-                        );
-                    };
-                }
-                xhr.onreadystatechange = function(e) {
-                    if (4 == this.readyState) {
-                        console.log(['xhr upload complete', e]);
-                    }
-                };
-                xhr.open('post', url, true);
-                xhr.send(formData);
-            });
-    </script>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>My Files</title>
+    <style>
+      body{
+        background-color:#eeeeee;
+      }
+      .upload-btn {
+         background-color: white;
+  color: black;
+  border: 2px solid #4CAF50; /* Green */
+        border-radius:5px;
+  -webkit-transition-duration: 0.4s; /* Safari */
+  transition-duration: 0.4s;
+}
+
+.upload-btn:hover {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+     
+      .upload-container{
+        border: 1px solid tomato;
+        display:grid;
+        grid-row-template:1fr 1fr 1fr;
+        padding:20px;
+      }
+      
+      .progress-container{
+        display:flex;
+        flex:1;
+      }
+      .progress{
+        display:flex;
+        flex:1;
+      }
+      .preview{
+        width:100px;
+        height:auto;
+        border:5px solid #ffffff;
+        min-height:50px;
+        transition:all 2s linear;
+      }
+       .files li{
+        list-style:none;
+      }
+      
+    </style>
+  </head>
+  <body>
+    <div class="upload-container">
+      <div
+       
+      >
+        <div >
+          <div >
+            <input id="fileupload" name="data" type="file" />
+            <button
+            value="upload"
+            id="upload"
+            class="upload-btn"
+          >
+            <i class="material-icons">Upload</i>
+          </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+              <div class='progress-container'>
+            <input
+              class="progress"
+              type="range"
+              min="0"
+              max="100"
+              value="0"
+              tabindex="0"
+              readonly
+              
+            />
+          </div>
+    <div>
+      
+
+    <ul class='files'>
+      
+    </ul>
+          </div>
+  </body>
+  <script>
+    
+    function addFiles(files){
+      const container=document.querySelector(".files");
+       container.innerHTML='';
+      [...files].forEach(file=>{
+        const li=document.createElement('li');
+        li.innerHTML=`<a href="${file.url}" download target='_blank'>
+        <img class='preview' src="${file.url}" alt=${file.file}/>${file.file}</a>`;
+        container.appendChild(li);
+      })
+    }
+    
+    const url = "/upload";
+    document.querySelector("#upload").addEventListener("click", function(e) {
+      e.preventDefault();
+      var fileInput = document.getElementById("fileupload");
+      var file = fileInput.files[0];
+      var formData = new FormData();
+      formData.append("file", file);
+      var xhr = new XMLHttpRequest();
+      xhr.addEventListener(
+        "progress",
+        function(e) {
+          var done = e.position || e.loaded,
+            total = e.totalSize || e.total;
+          const percentage = Math.floor((done / total) * 1000) / 10;
+          document.querySelector(".progress").value = percentage;
+        },
+        false
+      );
+      if (xhr.upload) {
+        xhr.upload.onprogress = function(e) {
+          var done = e.position || e.loaded,
+            total = e.totalSize || e.total;
+          const percentage = Math.floor((done / total) * 1000) / 10;
+          document.querySelector(".progress").value = percentage;
+        };
+      }
+      xhr.onreadystatechange = function(e) {
+        if (4 == this.readyState) {
+          document.querySelector(".progress").value = 100;
+          console.log(["xhr upload complete", e]);
+          fetchFiles();
+        }
+
+      };
+      xhr.open("post", url, true);
+      xhr.send(formData);
+    });
+    
+        
+    function fetchFiles(){
+      const filesUrl = "/files";
+
+    let promise = fetch(filesUrl);
+     promise.then(response => response.json())
+     .then(({files})=>addFiles(files));
+    }
+    fetchFiles();
+    
+
+  </script>
+  
 </html>
